@@ -7,14 +7,14 @@ const int TABLE_SIZE = 10;
 
 class HashTable {
 private:
-    vector<pair<int, string>> table;
+    vector<pair<long long, string>> table;
     vector<int> status;
 
-    int hash1(int key) {
+    int hash1(long long key) {
         return key % TABLE_SIZE;
     }
 
-    int hash2(int key) {
+    int hash2(long long key) {
         return 7 - (key % 7);
     }
 
@@ -24,7 +24,7 @@ public:
         status.resize(TABLE_SIZE, 0);
     }
 
-    void insert(int key, string value) {
+    void insert(long long key, string value) {
         int index = hash1(key);
         int step = hash2(key);
         int initialIndex = index;
@@ -33,6 +33,7 @@ public:
         while (true) {
             if (status[index] == 1 && table[index].first == key) {
                 table[index].second = value;
+                cout << "NIM sudah ada, nama diperbarui" << endl;
                 return;
             }
 
@@ -46,6 +47,7 @@ public:
                 }
                 table[index] = make_pair(key, value);
                 status[index] = 1;
+                cout << "Data berhasil disimpan di slot " << index << endl;
                 return;
             }
 
@@ -59,19 +61,20 @@ public:
         if (deletedIndex != -1) {
             table[deletedIndex] = make_pair(key, value);
             status[deletedIndex] = 1;
+            cout << "Data berhasil disimpan di slot " << deletedIndex << endl;
         } else {
             cout << "Tabel penuh" << endl;
         }
     }
 
-    void search(int key) {
+    void search(long long key) {
         int index = hash1(key);
         int step = hash2(key);
         int initialIndex = index;
 
         while (status[index] != 0) {
             if (status[index] == 1 && table[index].first == key) {
-                cout << "Data ditemukan : " << table[index].second << endl;
+                cout << "Data ditemukan di slot " << index << " : " << table[index].second << endl;
                 return;
             }
 
@@ -85,7 +88,7 @@ public:
         cout << "Data tidak ditemukan" << endl;
     }
 
-    void remove(int key) {
+    void remove(long long key) {
         int index = hash1(key);
         int step = hash2(key);
         int initialIndex = index;
@@ -124,28 +127,57 @@ public:
     }
 };
 
+bool isNumber(string s) {
+    if (s.empty() || s.length() > 18) {
+        return false;
+    }
+    for (char c : s) {
+        if (c < '0' || c > '9') {
+            return false;
+        }
+    }
+    return true;
+}
+
+long long inputNim() {
+    string s;
+    while (true) {
+        cout << "Masukkan NIM : ";
+        getline(cin, s);
+        if (isNumber(s)) {
+            return stoll(s);
+        }
+        cout << "NIM harus berupa angka (maksimal 18 digit)" << endl;
+    }
+}
+
 int main() {
     HashTable ht;
+    string input, nama;
+    char pilihan;
 
-    ht.insert(25068, "Andi");
-    ht.insert(25058, "Budi");
-    ht.insert(25078, "Citra");
-    ht.insert(25041, "Dewi");
+    do {
+        cout << "\n1. Insert\n2. Cari\n3. Hapus\n4. Tampilkan\n0. Keluar\nPilihan : ";
+        getline(cin, input);
+        pilihan = (input.length() == 1) ? input[0] : '-';
 
-    cout << "Isi Hash Table : " << endl;
-    ht.display();
-
-    cout << endl << "Mencari NIM 25058 : " << endl;
-    ht.search(25058);
-
-    cout << endl << "Menghapus NIM 25058 : " << endl;
-    ht.remove(25058);
-
-    cout << endl << "Mencari NIM 99999 : " << endl;
-    ht.search(99999);
-
-    cout << endl << "Hash Table setelah penghapusan : " << endl;
-    ht.display();
+        if (pilihan >= '1' && pilihan <= '3') {
+            long long nim = inputNim();
+            if (pilihan == '1') {
+                cout << "Masukkan nama : ";
+                getline(cin, nama);
+                ht.insert(nim, nama);
+            } else if (pilihan == '2') {
+                ht.search(nim);
+            } else {
+                ht.remove(nim);
+            }
+        } else if (pilihan == '4') {
+            ht.display();
+        } else if (pilihan != '0') {
+            cout << "Pilihan tidak valid" << endl;
+        }
+    } while (pilihan != '0');
 
     return 0;
 }
